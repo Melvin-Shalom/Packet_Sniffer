@@ -1,7 +1,8 @@
 <h1>Packet_Sniffer</h1>
 
 <h3>Description:</h3>
-The Network Sniffer is a Python script that allows you to capture and analyze network packets in real-time. It provides insights into the types of packets being transmitted over the network, including Ethernet frames, IP packets, and transport layer protocols such as TCP, UDP, and ICMP.
+<p>The Network Sniffer is a <strong>Python</strong> script that allows you to capture and analyze network packets in real-time. It provides insights into the types of packets being transmitted over the network, including Ethernet frames, IP packets, and transport layer protocols such as <strong>TCP</strong>, <strong>UDP</strong>, and <strong>ICMP</strong>.
+</p>
 
 <h3>Features:</h3>
 <ul>
@@ -13,6 +14,8 @@ The Network Sniffer is a Python script that allows you to capture and analyze ne
 </ul>
 
 <h3>Requirements:</h3>
-- Python 3.11
-- termcolor
-- PrettyTable (optional, for enhanced tabular output)
+<ul>
+  <li>Python 3.11</li>
+  <li>termcolor</li>
+  <li>PrettyTable (optional, for enhanced tabular output)</li>
+</ul>
