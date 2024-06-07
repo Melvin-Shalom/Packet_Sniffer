@@ -22,7 +22,7 @@
   </li>
 </ol>
 
-<h3>Features:</h3>
+<h2>Features:</h2>
 <ul>
   <li>Captures and analyzes Ethernet frames to extract MAC addresses and protocol information.</li>
   <li>Parses IP packets to determine source and destination IP addresses, TTL (Time-To-Live), and transport layer protocol.</li>
@@ -31,9 +31,9 @@
   <li>Includes packet statistics functionality to track the count of packets per protocol and display statistics every 10 seconds.</li>
 </ul>
 
-<h3>Requirements:</h3>
+<h2>Requirements:</h2>
 <ul>
   <li>Python 3.11</li>
-  <li>termcolor</li>
+  <li>Termcolor Module</li>
   <li>PrettyTable (optional, for enhanced tabular output)</li>
 </ul>
