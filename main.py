@@ -22,7 +22,6 @@ def get_ipv4(addr):
         print(f"Error converting IPv4 address: {e}")
         return "0.0.0.0"
 
-# Ethernet frame
 def parse_frame(frame):
     try:
         eth_len = 14
@@ -51,21 +50,14 @@ def parse_frame(frame):
 
 def parse_packet(packet):
     try:
-        # Contains IP version and Header Length
         first_byte = packet[0]
-        
-        # First 4 bits is version
         ip_version = first_byte >> 4
-        # Next 4 bits is header_length
         ip_header_length = (first_byte & 15) * 4
-
         ttl, proto, src, dest = struct.unpack('!8xBB2x4s4s', packet[:20])
         
-        # IP address in string format
         src_ip = get_ipv4(src)
         dest_ip = get_ipv4(dest)
         
-        # Reverse DNS lookup
         src_web = rev_dnslookup(src_ip)
         dest_web = rev_dnslookup(dest_ip)
         
@@ -128,11 +120,8 @@ def parse_UDP(data):
 def parse_TCP(data):
     try:
         src_port, dest_port, seq, ack, offset_flags = struct.unpack('!HHLLH', data[:14])
-        
-        # Extract first 4 bits and multiply by 4 to get the header length
         tcp_header_length = (offset_flags >> 12) * 4
         
-        # Extract all the flags starting at position 5 from left and so and with 2^5
         flag_urg = (offset_flags & 32) >> 5
         flag_ack = (offset_flags & 16) >> 4
         flag_psh = (offset_flags & 8) >> 3
@@ -166,11 +155,9 @@ def parse_transport_packet(data, protocol):
         return None
 
 def rev_dnslookup(ip_addr):
-    # Return domain name as a string or 'private_ip' if a private ip
     try:
         ip_classes = [int(x) for x in ip_addr.split('.')]
         
-        # Ignore if a private IP
         if ((ip_classes[0] == 10) or
             (ip_classes[0] == 172 and (16 <= ip_classes[1] <= 31)) or
             (ip_classes[0] == 192 and ip_classes[1] == 168)):
@@ -189,10 +176,8 @@ def rev_dnslookup(ip_addr):
         print(f"Error in reverse DNS lookup: {e}")
         return None
 
-# *******Main************
 def main():
     try:
-        # Make the socket connection
         conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
     except socket.error as e:
         print(f"Socket could not be created. Error: {e}")
@@ -203,7 +188,6 @@ def main():
 
     while True:
         try:
-            # Receive the ethernet frame
             payload, addr = conn.recvfrom(65535)
             ip_packet, ip_protocol = parse_frame(payload)
             if ip_protocol == 'IPv4':
@@ -213,7 +197,6 @@ def main():
                     packet_count[transport_proto] += 1
                     application_packet = parse_transport_packet(transport_packet, transport_proto)
 
-            # Display packet statistics every 10 seconds
             if time.time() - start_time > 10:
                 start_time = time.time()
                 table = PrettyTable(['Protocol', 'Packet Count'])
