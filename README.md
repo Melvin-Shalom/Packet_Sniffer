@@ -42,6 +42,6 @@
 	</li>
 	<li>
 		<h4>Execute the Python script:</h4>
-		<code>sudo /venv/bin/python3 capture.py</code>
+		<code>sudo /venv/bin/python3 main.py</code>
 	</li>
 </ol>
