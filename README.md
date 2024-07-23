@@ -19,7 +19,7 @@
 <ul>
 	<li>Python 3.11</li>
 	<li>Termcolor Module</li>
-	<li>PrettyTable (optional, for enhanced tabular output)</li>
+	<li>PrettyTable Module</li>
 </ul>
 
 <h2>Step for Execution</h2>
