@@ -18,8 +18,6 @@
 <h2>Requirements</h2>
 <ul>
 	<li>Python 3.11</li>
-	<li>Termcolor Module</li>
-	<li>PrettyTable Module</li>
   	<li>Terminal or Command Prompt</li>
 </ul>
 
