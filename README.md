@@ -25,7 +25,7 @@
 <h2>Step for Execution</h2>
 <ol>
 	<li>
-		<h4>Clone the repository</h4>
+		<h4>Open the Terminal and Clone the Repository</h4>
 		<code>git clone https://github.com/Melvin-Shalom/Packet_Sniffer.git</code><br>
 	</li>
 	<li>
