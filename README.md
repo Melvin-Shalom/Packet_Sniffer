@@ -26,7 +26,7 @@
 <ol>
 	<li>
 		<h4>Clone the repository</h4>
-		<code>git clone git clone https://github.com/Melvin-Shalom/Packet_Sniffer.git</code><br>
+		<code>git clone https://github.com/Melvin-Shalom/Packet_Sniffer.git</code><br>
 	</li>
 	<li>
 		<h4>Navigate to the project directory</h4>
