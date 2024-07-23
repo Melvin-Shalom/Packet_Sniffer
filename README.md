@@ -8,20 +8,6 @@
   To know how the Virtual Environment works, <a href="https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/" target="_blank">visit here</a>.
 </p>
 
-<h2>Step for Execution:</h2>
-<ol>
-  <li>
-    <strong>Activate the Virtualenv</strong><br>
-    <small>Navigate to your project directory and activate the virtual environment:</small>
-    <code>source venv/bin/activate</code>
-  </li>
-  <li>
-    <strong>Execute the main.py file</strong><br>
-    <small>Execute the Python script:</small>
-    <code>sudo /venv/bin/python3 capture.py</code>
-  </li>
-</ol>
-
 <h2>Features:</h2>
 <ul>
   <li>Captures and analyzes Ethernet frames to extract MAC addresses and protocol information.</li>
@@ -37,3 +23,17 @@
   <li>Termcolor Module</li>
   <li>PrettyTable (optional, for enhanced tabular output)</li>
 </ul>
+
+<h2>Step for Execution:</h2>
+<ol>
+  <li>
+    <strong>Activate the Virtualenv</strong><br>
+    <small>Navigate to your project directory and activate the virtual environment:</small>
+    <code>source venv/bin/activate</code>
+  </li>
+  <li>
+    <strong>Execute the main.py file</strong><br>
+    <small>Execute the Python script:</small>
+    <code>sudo /venv/bin/python3 capture.py</code>
+  </li>
+</ol>
