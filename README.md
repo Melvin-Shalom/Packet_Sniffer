@@ -20,7 +20,7 @@
 	<li>Python 3.11</li>
 	<li>Termcolor Module</li>
 	<li>PrettyTable Module</li>
-  	<li>Terminal or command prompt</li>
+  	<li>Terminal or Command Prompt</li>
 </ul>
 
 <h2>Step for Execution</h2>
