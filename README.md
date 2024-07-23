@@ -4,9 +4,7 @@
 <p>The Network Sniffer is a Console Based Application based on <strong>Python</strong> that allows you to capture and analyze network packets in real-time. It provides insights into the types of packets being transmitted over the network, including Ethernet frames, IP packets, and transport layer protocols such as <strong>TCP</strong>, <strong>UDP</strong>, and <strong>ICMP</strong>. Additionally, a <strong>virtual environment</strong> was set up to manage dependencies effectively. The required modules are documented in a file named <strong><em>requirements.txt</em></strong>.
 </p>
 
-<p>
-	To know how the Virtual Environment works, <a href="https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/" target="_blank">visit here</a>.
-</p>
+<p>To know how the Virtual Environment works, <a href="https://www.freecodecamp.org/news/how-to-setup-virtual-environments-in-python/" target="_blank">visit here</a>.</p>
 
 <h2>Features</h2>
 <ul>
