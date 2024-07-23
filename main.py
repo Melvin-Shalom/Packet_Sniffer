@@ -1,25 +1,27 @@
 import struct
 import socket
-import requests
-import json
 import time
 from collections import Counter
 from prettytable import PrettyTable
 from termcolor import colored
+import logging
+import os
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_mac_addr(bytes_addr):
     try:
-        bytes_str = map("{:02x}".format, bytes_addr)
-        return ':'.join(bytes_str).upper()
+        return ':'.join(f"{b:02x}".upper() for b in bytes_addr)
     except Exception as e:
-        print(f"Error converting MAC address: {e}")
+        logging.error(f"Error converting MAC address: {e}")
         return "00:00:00:00:00:00"
 
 def get_ipv4(addr):
     try:
         return '.'.join(map(str, addr))
     except Exception as e:
-        print(f"Error converting IPv4 address: {e}")
+        logging.error(f"Error converting IPv4 address: {e}")
         return "0.0.0.0"
 
 def parse_frame(frame):
@@ -32,49 +34,37 @@ def parse_frame(frame):
         src_mac = get_mac_addr(src_mac)
         
         proto = hex(proto)
-        if proto == '0x800':
-            ip_proto = 'IPv4'
-        elif proto == '0x806':
-            ip_proto = 'ARP'
-        elif proto == '0x86DD':
-            ip_proto = 'IPv6'
-        else:
-            ip_proto = proto
+        ip_proto = {
+            '0x800': 'IPv4',
+            '0x806': 'ARP',
+            '0x86DD': 'IPv6'
+        }.get(proto, proto)
         
-        print(colored('\n\n*********Ethernet Frame*********', 'green'))
-        print(f"Source_MAC: {colored(src_mac, 'yellow')}\tDestination_MAC: {colored(dest_mac, 'yellow')}\nInternet Protocol: {colored(ip_proto, 'cyan')}")
+        logging.debug(f"Source_MAC: {src_mac}\tDestination_MAC: {dest_mac}\nInternet Protocol: {ip_proto}")
         return eth_data, ip_proto
     except Exception as e:
-        print(f"Error parsing Ethernet frame: {e}")
+        logging.error(f"Error parsing Ethernet frame: {e}")
         return None, None
 
 def parse_packet(packet):
     try:
         first_byte = packet[0]
-        ip_version = first_byte >> 4
         ip_header_length = (first_byte & 15) * 4
         ttl, proto, src, dest = struct.unpack('!8xBB2x4s4s', packet[:20])
         
         src_ip = get_ipv4(src)
         dest_ip = get_ipv4(dest)
         
-        src_web = rev_dnslookup(src_ip)
-        dest_web = rev_dnslookup(dest_ip)
+        transport_proto = {
+            1: 'ICMP',
+            6: 'TCP',
+            17: 'UDP'
+        }.get(proto, f'Unknown Protocol Field = {proto}')
         
-        if proto == 1:
-            transport_proto = 'ICMP'
-        elif proto == 6:
-            transport_proto = 'TCP'
-        elif proto == 17:
-            transport_proto = 'UDP'
-        else:
-            transport_proto = 'Unknown Protocol Field = ' + str(proto)
-        
-        print(colored('---------IP Packet---------', 'green'))
-        print(f"Source_IP: {colored(src_ip, 'yellow')}\tDestination_IP: {colored(dest_ip, 'yellow')}\nTTL: {colored(ttl, 'cyan')} hops\tTransport_Protocol: {colored(transport_proto, 'cyan')}")
+        logging.debug(f"Source_IP: {src_ip}\tDestination_IP: {dest_ip}\nTTL: {ttl} hops\tTransport_Protocol: {transport_proto}")
         return packet[ip_header_length:], transport_proto
     except Exception as e:
-        print(f"Error parsing IP packet: {e}")
+        logging.error(f"Error parsing IP packet: {e}")
         return None, None
 
 def parse_ICMP(data):
@@ -100,21 +90,19 @@ def parse_ICMP(data):
         }
         icmp_type = icmp_types.get(field_type, 'Reserved or Deprecated')
         
-        print(colored('---------ICMP Packet---------', 'green'))
-        print(f"Type: {colored(icmp_type, 'cyan')}")
+        logging.debug(f"Type: {icmp_type}")
         return data[8:]
     except Exception as e:
-        print(f"Error parsing ICMP packet: {e}")
+        logging.error(f"Error parsing ICMP packet: {e}")
         return None
 
 def parse_UDP(data):
     try:
         src_port, dest_port, packet_length = struct.unpack('!HHH', data[:6])
-        print(colored('---------UDP Packet---------', 'green'))
-        print(f"Source_Port: {colored(src_port, 'yellow')}\tDestination_Port: {colored(dest_port, 'yellow')}\nPacket_Length: {colored(packet_length, 'cyan')}")
+        logging.debug(f"Source_Port: {src_port}\tDestination_Port: {dest_port}\nPacket_Length: {packet_length}")
         return data[8:]
     except Exception as e:
-        print(f"Error parsing UDP packet: {e}")
+        logging.error(f"Error parsing UDP packet: {e}")
         return None
 
 def parse_TCP(data):
@@ -129,29 +117,24 @@ def parse_TCP(data):
         flag_syn = (offset_flags & 2) >> 1
         flag_fin = offset_flags & 1
         
-        print(colored('---------TCP Packet---------', 'green'))
-        print(f"Source_Port: {colored(src_port, 'yellow')}\tDestination_Port: {colored(dest_port, 'yellow')}\nHeader_Length: {colored(tcp_header_length, 'cyan')}")
-        print(f"Sequence: {colored(seq, 'cyan')}")
-        print(f"Acknowledgement: {colored(ack, 'cyan')}")
-        print("Flags: URG ACK PSH RST SYN FIN")
-        print(f"      {flag_urg:3} {flag_ack:3} {flag_psh:3} {flag_rst:3} {flag_syn:3} {flag_fin:3}")
+        logging.debug(f"Source_Port: {src_port}\tDestination_Port: {dest_port}\nHeader_Length: {tcp_header_length}")
+        logging.debug(f"Sequence: {seq}\nAcknowledgement: {ack}")
+        logging.debug(f"Flags: URG ACK PSH RST SYN FIN\n      {flag_urg:3} {flag_ack:3} {flag_psh:3} {flag_rst:3} {flag_syn:3} {flag_fin:3}")
         return data[tcp_header_length:]
     except Exception as e:
-        print(f"Error parsing TCP packet: {e}")
+        logging.error(f"Error parsing TCP packet: {e}")
         return None
 
 def parse_transport_packet(data, protocol):
     try:
-        application_packet = None
         if protocol == 'TCP':
-            application_packet = parse_TCP(data)
+            return parse_TCP(data)
         elif protocol == 'UDP':
-            application_packet = parse_UDP(data)
+            return parse_UDP(data)
         elif protocol == 'ICMP':
-            application_packet = parse_ICMP(data)
-        return application_packet
+            return parse_ICMP(data)
     except Exception as e:
-        print(f"Error parsing transport packet: {e}")
+        logging.error(f"Error parsing transport packet: {e}")
         return None
 
 def rev_dnslookup(ip_addr):
@@ -161,53 +144,64 @@ def rev_dnslookup(ip_addr):
         if ((ip_classes[0] == 10) or
             (ip_classes[0] == 172 and (16 <= ip_classes[1] <= 31)) or
             (ip_classes[0] == 192 and ip_classes[1] == 168)):
-            print(f'Private IP Address: {ip_addr}')
+            logging.info(f'Private IP Address: {ip_addr}')
             return 'private_ip'
         else:
             try:
                 rdns_data = socket.gethostbyaddr(ip_addr)
-                print(f"Domain Name: {rdns_data[0]}")
-                print(f"Host IP: {rdns_data[2][0]}")
+                logging.info(f"Domain Name: {rdns_data[0]}")
+                logging.info(f"Host IP: {rdns_data[2][0]}")
                 return rdns_data[0]
             except socket.error:
-                print("Domain Name not found.")
+                logging.info("Domain Name not found.")
                 return None
     except Exception as e:
-        print(f"Error in reverse DNS lookup: {e}")
+        logging.error(f"Error in reverse DNS lookup: {e}")
         return None
+
+def clear_console():
+    os.system('clear')  # On Windows, use 'cls'
 
 def main():
     try:
         conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
     except socket.error as e:
-        print(f"Socket could not be created. Error: {e}")
+        logging.error(f"Socket could not be created. Error: {e}")
         return
 
     packet_count = Counter()
     start_time = time.time()
 
-    while True:
-        try:
-            payload, addr = conn.recvfrom(65535)
-            ip_packet, ip_protocol = parse_frame(payload)
-            if ip_protocol == 'IPv4':
-                packet_count['IPv4'] += 1
-                transport_packet, transport_proto = parse_packet(ip_packet)
-                if transport_packet and transport_proto:
-                    packet_count[transport_proto] += 1
-                    application_packet = parse_transport_packet(transport_packet, transport_proto)
+    try:
+        while True:
+            try:
+                payload, addr = conn.recvfrom(65535)
+                ip_packet, ip_protocol = parse_frame(payload)
+                if ip_protocol == 'IPv4':
+                    packet_count['IPv4'] += 1
+                    transport_packet, transport_proto = parse_packet(ip_packet)
+                    if transport_packet and transport_proto:
+                        packet_count[transport_proto] += 1
+                        parse_transport_packet(transport_packet, transport_proto)
 
-            if time.time() - start_time > 10:
-                start_time = time.time()
-                table = PrettyTable(['Protocol', 'Packet Count'])
-                for protocol, count in packet_count.items():
-                    table.add_row([protocol, count])
-                print(colored('\nPacket Statistics (Last 10 seconds):', 'magenta'))
-                print(table)
+                if time.time() - start_time > 10:
+                    start_time = time.time()
+                    clear_console()
+                    table = PrettyTable(['Protocol', 'Packet Count'])
+                    for protocol, count in packet_count.items():
+                        table.add_row([protocol, count])
+                    print(colored('\nPacket Statistics (Last 10 seconds):', 'magenta'))
+                    print(table)
 
-        except Exception as e:
-            print(f"Error receiving or processing packet: {e}")
+            except Exception as e:
+                logging.error(f"Error receiving or processing packet: {e}")
+
+    except KeyboardInterrupt:
+        print("\n\n\nStopped!!!")
+    finally:
+        conn.close()
 
 if __name__ == "__main__":
     main()
+
 
