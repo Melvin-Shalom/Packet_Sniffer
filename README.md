@@ -20,29 +20,41 @@
   <li>Terminal or Command Prompt</li>
 </ul>
 
-<h2>Steps to Run</h2>
-<ol>
-  <li>
-    <h4>Clone the Repository</h4>
-    <code>git clone https://github.com/Melvin-Shalom/Packet_Sniffer.git</code>
-  </li>
-  <li>
-    <h4>Navigate to Project Directory</h4>
-    <code>cd Packet_Sniffer/</code>
-  </li>
-  <li>
-    <h4>Activate the Virtual Environment</h4>
-    <code>source venv/bin/activate</code>
-  </li>
-  <li>
-    <h4>Install Required Modules</h4>
-    <code>pip install -r requirements.txt</code>
-  </li>
-  <li>
-    <h4>Run the Application</h4>
-    <code>sudo /venv/bin/python3 main.py</code>
-  </li>
-</ol>
+## Steps to Run
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/Melvin-Shalom/Packet_Sniffer.git
+   ```
+
+2. **Navigate to the project directory**
+
+   ```bash
+   cd Packet_Sniffer/
+   ```
+
+3. **Create & activate the virtual environment**
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate    # For Linux/macOS
+   .\venv\Scripts\activate     # For Windows
+   ```
+
+4. **Install dependencies**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **Run the packet sniffer script**
+
+   ```bash
+   sudo venv/bin/python3 main.py   # For Linux/macOS
+   python main.py                  # For Windows
+   ```
+
 
 <h2>Usage</h2>
 <p>
